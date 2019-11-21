@@ -1,0 +1,6 @@
+framework module LogStr {
+  umbrella header "LogStr.h"
+
+  export *
+  module * { export * }
+}

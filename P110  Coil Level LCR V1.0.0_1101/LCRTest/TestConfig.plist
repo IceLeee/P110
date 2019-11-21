@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SpecialBuildName</key>
+	<string>B390-PPA</string>
+	<key>AVGTime</key>
+	<string>1</string>
+	<key>Config</key>
+	<string>Drop Build</string>
+	<key>Configs</key>
+	<array>
+		<string>POC</string>
+		<string>DOC</string>
+		<string>DOE</string>
+		<string>Proto</string>
+		<string>EVT</string>
+		<string>DVT</string>
+		<string>PVT</string>
+		<string>MP</string>
+	</array>
+	<key>EEEECode</key>
+	<dict>
+		<key>MJ2V</key>
+		<string>MJ2V</string>
+	</dict>
+	<key>LCRPortName</key>
+	<string>USB0::0x0957::0x0909::MY54203823::INSTR</string>
+	<key>Lines</key>
+	<array>
+		<string>ATKS-1</string>
+		<string></string>
+	</array>
+	<key>McuPortName</key>
+	<string>/dev/tty.usbserial-FTAO47W4</string>
+	<key>SNLength</key>
+	<string>17</string>
+	<key>SW_Name</key>
+	<string> COIL LEVEL LCR TEST</string>
+	<key>SW_Version</key>
+	<string>1.0.0</string>
+	<key>Station_ID</key>
+	<string>Coil LCR</string>
+	<key>WaitTime1</key>
+	<string>1.5</string>
+	<key>WaitTime2</key>
+	<string>1</string>
+	<key>New item</key>
+	<string></string>
+</dict>
+</plist>
