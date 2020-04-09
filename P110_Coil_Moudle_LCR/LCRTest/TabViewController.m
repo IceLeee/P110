@@ -52,9 +52,6 @@
     _messageViews = [[NSView alloc] initWithFrame:tabFrame];
     
     _messageTextView1 = [[MessageTextView alloc] initWithFrame:tabFrame];
-    _messageTextView1.wantsLayer = YES;
-    _messageTextView1.layer.backgroundColor = [NSColor redColor].CGColor;
-    
    // _messageTextView2 = [[MessageTextView alloc] initWithFrame:tabFrame];
     
     [_messageTextView1.scrollViewContainer setFrame:table1Frame];

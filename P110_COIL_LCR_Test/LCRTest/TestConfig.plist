@@ -3,11 +3,22 @@
 <plist version="1.0">
 <dict>
 	<key>SpecialBuildName</key>
-	<string>B390-PPA</string>
+	<string>X3051-P1</string>
 	<key>AVGTime</key>
 	<string>1</string>
 	<key>Config</key>
-	<string>Drop Build</string>
+	<dict>
+		<key>1</key>
+		<string>Config1</string>
+		<key>2</key>
+		<string>Config2</string>
+		<key>3</key>
+		<string>Config3</string>
+		<key>4</key>
+		<string>Config4</string>
+		<key>5</key>
+		<string>Config5</string>
+	</dict>
 	<key>Configs</key>
 	<array>
 		<string>POC</string>
@@ -23,6 +34,12 @@
 	<dict>
 		<key>MJ2V</key>
 		<string>MJ2V</string>
+		<key>New item</key>
+		<string></string>
+		<key>New item - 2</key>
+		<string></string>
+		<key>New item - 3</key>
+		<string></string>
 	</dict>
 	<key>LCRPortName</key>
 	<string>USB0::0x0957::0x0909::MY54203823::INSTR</string>
@@ -36,7 +53,7 @@
 	<key>SNLength</key>
 	<string>17</string>
 	<key>SW_Name</key>
-	<string> COIL LEVEL LCR TEST</string>
+	<string>COIL LCR TEST</string>
 	<key>SW_Version</key>
 	<string>1.0.0</string>
 	<key>Station_ID</key>
@@ -45,7 +62,5 @@
 	<string>1.5</string>
 	<key>WaitTime2</key>
 	<string>1</string>
-	<key>New item</key>
-	<string></string>
 </dict>
 </plist>

@@ -128,7 +128,6 @@
 
 @property(retain) NSString *strCoilSN1;
 @property(retain) NSString *strCoilSNConfig1;
-@property(copy) NSString *strConfig1;//存放config的变量(20191102 by Ice)
 
 //@property(retain) NSString *str21SNConfig1;
 //@property(retain) NSDictionary *dict21SNConfig;

@@ -7,6 +7,7 @@
 //
 
 #import "MainView.h"
+#import<LogStr/LogStr.h>
 
 #define kStartButtonTag         101
 #define kEEButtonTag            102
@@ -16,6 +17,7 @@
 #define kButtonSpecial          601
 
 #define PI 3.1415926
+
 
 NSString* const MESSAGE_TO_UPDATE_UI = @"MESSAGE_TO_UPDATE_UI";
 extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receive data
@@ -47,9 +49,14 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         
         _pdca1 = [[InstantPudding alloc] init];
         
-//        _strSFCUrl = [self getSFCURL];
+        _strSFCUrl = [self getSFCURL];
         
         _strPortStatus = [[NSString alloc] initWithFormat:@""];
+        
+        LogStr * log1 = [LogStr shareTools];
+        
+        //使用默认配置，log在桌面输出
+         [log1 syncLogSetting];
     }
     
     return self;
@@ -71,7 +78,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
 
 - (void)viewDidMoveToWindow {
     [super viewDidMoveToWindow];
-    
+//    [self buttonAction:nil];
     static int iFisrt = 0;
     
     if (iFisrt == 0) {
@@ -111,7 +118,6 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         [self initTestScriptFile];
         [self initAllControllers];
         [self initAllDevices];
-
         
         iFisrt++;
     }
@@ -138,10 +144,15 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     //_bCheckSFC = [[dict objectForKey:@"CheckSFC"] boolValue];
     
     _iSNL = [[dict objectForKey:@"SNLength"] intValue];
+    
+   
     _avgTime = [dict objectForKey:@"AVGTime"];
     _dictFourE = [dict objectForKey:@"EEEECode"];
+   
     _dictConfig  = [dict objectForKey:@"Config"];
-   // _dict21SNConfig = [dict objectForKey:@"Config"];
+    
+    _bobcat = [[dict objectForKey:@"SFCMode"] boolValue];
+   
     _testFixture = [self getComputerNameForTestFixture];
 }
 
@@ -242,8 +253,8 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
 {
     [self initSegmentedController];
     
-    [self initDescriptionLabel];
-    [self initDescriptionEdit];
+    [self initConfigLabel];
+    [self initConfigEdit];
     
     [self initASNLable1];
     [self initASNEdit1];
@@ -274,7 +285,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     _tabViewController.tableView1.listData = _commandData1;
     [self addSubview:_tabViewController];
     
-    NSRect statusFrame = NSMakeRect(FIXTURESTATUSVIEW_X, FIXTURESTATUSVIEW_Y-63, FIXTURESTATUSVIEW_WIDTH, FIXTURESTATUSVIEW_HEIGHT);
+    NSRect statusFrame = NSMakeRect(FIXTURESTATUSVIEW_X, FIXTURESTATUSVIEW_Y -63, FIXTURESTATUSVIEW_WIDTH, FIXTURESTATUSVIEW_HEIGHT);
     _statusTextView = [[NSTextField alloc] initWithFrame:statusFrame];
     [_statusTextView setBackgroundColor:[NSColor controlHighlightColor]];
     [_statusTextView setFont:[NSFont boldSystemFontOfSize:14.0]];
@@ -285,8 +296,9 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
 //    _sfcTextView = [[MessageTextView alloc] initWithFrame:textViewFram];
 //    [self addSubview:_sfcTextView];
 //
-    [self initStatisticsView];
     
+    [self initStatisticsView];
+
     [_editASN1 becomeFirstResponder];
     NSTimer *myTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
@@ -295,15 +307,15 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
                                                        repeats:YES];
     
     [[NSRunLoop currentRunLoop] addTimer:myTimer forMode:NSModalPanelRunLoopMode];
+
 }
 
 - (void)initStatisticsView {
-    NSRect statisticsFrame = NSMakeRect(STATISTICSVIEW_X, STATISTICSVIEW_Y - TITLEVIEW_HEIGHT+33, STATISTICSVIEW_WIDTH+300, STATISTICSVIEW_HEIGHT);
+    NSRect statisticsFrame = NSMakeRect(STATISTICSVIEW_X, STATISTICSVIEW_Y - TITLEVIEW_HEIGHT +33, STATISTICSVIEW_WIDTH+300, STATISTICSVIEW_HEIGHT);
     _statisticsView = [[StatisticsView alloc] initWithFrame:statisticsFrame];
     //[_statisticsView clearStatistics];//清空
     [self addSubview:_statisticsView];
 }
-
 
 - (void)initSegmentedController
 {
@@ -350,7 +362,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     [self addSubview:_timeView1];
 }
 
-- (void)initDescriptionLabel
+- (void)initConfigLabel
 {
     NSRect labelFrame = NSMakeRect(CONFIGLABEL1_X, CONFIGEDIT1_Y, CONFIGLABEL1_WIDTH + 35, CONFIGLABEL1_HEIGHT);
     
@@ -363,17 +375,17 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     [self addSubview:label];
 }
 
-- (void)initDescriptionEdit
+- (void)initConfigEdit
 {
     NSRect editFrame = NSMakeRect(CONFIGEDIT1_X +95, CONFIGEDIT1_Y, CONFIGEDIT_WIDTH - 75, CONFIGLABEL1_HEIGHT);
     
-    _editDescription = [[NSTextField alloc]initWithFrame:editFrame];
-    [_editDescription setFont:[NSFont systemFontOfSize:18.0]];
-    [_editDescription setTag:kConfigEditViewTag];
+    _editConfig1 = [[NSTextField alloc]initWithFrame:editFrame];
+    [_editConfig1 setFont:[NSFont systemFontOfSize:18.0]];
+    [_editConfig1 setTag:kConfigEditViewTag];
     //[_editDescription setDelegate:self];
-    [_editDescription setBordered:YES];
-    [_editDescription setEditable:YES];
-    [self addSubview:_editDescription];
+    [_editConfig1 setBordered:YES];
+    [_editConfig1 setEditable:YES];
+    [self addSubview:_editConfig1];
 }
 
 - (void)initASNLable1{
@@ -498,6 +510,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     [self addSubview:btn];
 }
 
+
 - (void)initButtonSpecial
 {
     //设置button的Frame
@@ -531,7 +544,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     BOOL result = NO;
     
     if (commandSelector == @selector(insertNewline:)) {
-        [self startButtonAction];
+       // [self startButtonAction];
         
         result = YES;
     }
@@ -568,35 +581,50 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     if (button.tag == kCheckButtonTag) {
         [self startCheckMeter];
     }
-    
+
     if (button.tag == kStartButtonTag) {
         if (_isStart) {
             [self stopTestWithIndex:0];
         } else {
-            [_editASN1 selectText:_editASN1];
-            //获取主条码并link coilSN
-            _strSN1 = [_editASN1 stringValue];
             
-//            _strCoilSN1 = @"";
-            _strSFCUrl = @"http://10.32.13.55/bobcat/sfc_response.aspx";
-            NSString* strParam = [NSString stringWithFormat:@"p=Getconfig&c=Query_History&sn=%@", _strSN1];
-            _strConfig1 = [self sendRequestSync:_strSFCUrl withParam:strParam TimeOut:10.0];
-            NSLog(@"请求的参数为:%@",_strConfig1);
-            if ([_strConfig1 rangeOfString:@"PASS"].length > 0) {
-//
-                _strConfig1 = [self getData:_strConfig1 startSet:@"config=" endSet:nil];
-                NSLog(@"获取的config为:%@",_strConfig1);
-                [_editDescription setStringValue:_strConfig1];
+            [_editASN1 selectText:_editASN1];
+            _strSN1 = [_editASN1 stringValue];
+            _strUpperFerriteSN1 = @"";
+//            _strLowerFerriteSN1 = @"";
+
+//            从mes link config 以及ferrite SN
+            NSString* strParam1 = [NSString stringWithFormat:@"p=Getconfig&c=Query_history&sn=%@", _strSN1];
+            NSString* strParam2 = [NSString stringWithFormat:@"p=Getp110SN&c=Query_history&sn=%@", _strSN1];
+            NSString *URL = @"http://10.32.13.55/bobcat/sfc_response.aspx";
+            _strReturn1 = [self sendRequestSync:URL withParam:strParam1 TimeOut:10.0];
+            _strReturn2 = [self sendRequestSync:URL withParam:strParam2 TimeOut:10.0];
+            ICTLog(_strReturn1);
+            ICTLog(_strReturn2);
+           
+            if ([_strReturn1 rangeOfString:@"PASS"].length > 0) {
+                _strConfig1 = [self getData:_strReturn1 startSet:@"config=" endSet:nil];
+                [_editConfig1 setStringValue:_strConfig1];
             } else {
-                
                 [_statusTextView setTextColor:[NSColor redColor]];
                 [_statusTextView setStringValue:@"获取config失败!"];
-                //[self showAlertViewWarning:@"该Ferrite SN 未关联Coil SN！"];
+                [self showAlertViewWarning:@"获取config失败!"];
                 [_editASN1 setStringValue:@""];
                 [_editASN1 setEditable:YES];
                 return;
             }
-        
+            
+            if ([_strReturn2 rangeOfString:@"PASS"].length > 0) {
+                _strUpperFerriteSN1 = [self getData:_strReturn2 startSet:@"Ferrite_SN=" endSet:nil];
+            } else {
+                [_statusTextView setTextColor:[NSColor redColor]];
+                [_statusTextView setStringValue:@"关联SN失败!"];
+                [self showAlertViewWarning:@"该Ferrite SN未关联！"];
+                [_editASN1 setStringValue:@""];
+                [_editASN1 setEditable:YES];
+                
+                return;
+            }
+            
             strSNTmp = _strSN1;
             
             _F = 0;
@@ -607,33 +635,46 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
             
             if ( _strSN1.length == _iSNL)
             {
-                //条码长度正确的时候开始卡关
-//                if ([self getQuerySFCON]) {
-//                    NSString *strParam = [NSString stringWithFormat:@"c=QUERY_RECORD&sn=%@&tsid=%@&p=UNIT_PROCESS_CHECK", [strSNTmp substringToIndex:17], _testFixture];
-//                    NSString *strReturn = [self sendRequestSync:_strSFCUrl withParam:strParam TimeOut:10.0f];
-//                    NSLog(@"strReturn = %@",strReturn);
-//                    if ([strReturn length] > 0) {
-//                        NSString *strTmp = [self getData:strReturn startSet:@"unit_process_check=" endSet:nil];
-//                        NSLog(@"strTmp = %@",strTmp);
-//                        if([strTmp rangeOfString:@"OK"].length > 0) {
+//                进行卡关
+                if (_bobcat) {
+                    NSString *strParam = [NSString stringWithFormat:@"c=QUERY_RECORD&sn=%@&tsid=%@&p=UNIT_PROCESS_CHECK", [strSNTmp substringToIndex:17], _testFixture];
+                    NSString *strReturn = [self sendRequestSync:_strSFCUrl withParam:strParam TimeOut:10.0f];
+                    NSLog(@"strReturn = %@",strReturn);
+                    if ([strReturn length] > 0) {
+                        NSString *strTmp = [self getData:strReturn startSet:@"unit_process_check=" endSet:nil];
+                        NSLog(@"strTmp = %@",strTmp);
+                        if([strTmp rangeOfString:@"OK"].length > 0) {
+                
                             [self startTestWithIndex:0];
-//                        } else {
 //
-//                            [_editASN1 setStringValue:@""];
-//                            [_statusTextView setTextColor:[NSColor redColor]];
-//                            [_statusTextView setStringValue:strTmp];
-//                            //[self showAlertViewWarning:strTmp];
+                        } else {
 //
-//                        }
-//                    }
+                            [_editASN1 setStringValue:@""];
+                            [_statusTextView setTextColor:[NSColor redColor]];
+                            [_statusTextView setStringValue:strTmp];
+                            [self showAlertViewWarning:strTmp];
+                            return;
+
+                        }
+                    }
                 } else {
                     [_editASN1 setStringValue:@""];
                     [_statusTextView setTextColor:[NSColor redColor]];
-                    [_statusTextView setStringValue:@"SN长度错误,请重新输入!"];
+                    [_statusTextView setStringValue:@"GH卡关未开！"];
+                    [self showAlertViewWarning:@"GH卡关未开！"];
+                    return;
+                 
+                   
                 }
+            } else {
+                [_editASN1 setStringValue:@""];
+                [self showAlertViewWarning:@"条码有误，请重测！"];
+                return;
             }
+            
         }
     }
+}
 
 #pragma mark -
 
@@ -642,55 +683,12 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     
     NSString *strSNTmp = nil;
     strSNTmp = _strSN1;
-    //EEEE
-//    if (strSNTmp.length > 15) {
-//        NSString *strFourE = [strSNTmp substringWithRange:NSMakeRange(11, 4)];
-//
-//        _strLayer = @"SN Error";
-//
-//        for (NSString *str in _dictFourE) {
-//            //NSLog(@"str = %@",str);
-//            if ([strFourE isEqualToString:str]) {
-//                _strLayer = _dictFourE[str] ;
-//            }
-//        }
-//    }
-    
-//    if (strSNTmp.length >= 21) {
-//        NSString *strConf = [strSNTmp substringWithRange:NSMakeRange(20, 1)];
-//
-//        _str21SNConfig1 = @"SN Error";
-//
-//        for (NSString *str in _dict21SNConfig) {
-//            //NSLog(@"str = %@",str);
-//            if ([strConf isEqualToString:str]) {
-//                _str21SNConfig1 = _dict21SNConfig[str] ;
-//            }
-//        }
-//
-//    }
-//
-//    NSLog(@"主条码config: %@",_str21SNConfig1);
-    //Config
-//    if (_strCoilSN1.length >= 22) {
-//        NSString *strConf = [_strCoilSN1 substringWithRange:NSMakeRange(21, 1)];
-//
-//        _strCoilSNConfig1 = @"SN Error";
-//
-//        for (NSString *str in _dictConfig) {
-//            //NSLog(@"str = %@",str);
-//            if ([strConf isEqualToString:str]) {
-//                _strCoilSNConfig1 = _dictConfig[str] ;
-//            }
-//        }
-//
-//    }
-    
+ 
     dispatch_queue_t queue = dispatch_queue_create("Perform Commands", nil);
     
     dispatch_async(queue, ^{
-        [self->_commMCU write:@"2" type:@"serial"];
-        [NSThread sleepForTimeInterval:self->_waitTime1.floatValue];
+        [_commMCU write:@"2" type:@"serial"];
+        [NSThread sleepForTimeInterval:_waitTime1.floatValue];
     });
 
     
@@ -723,7 +721,6 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     
     //dispatch_queue_t queue = dispatch_queue_create("Perform Commands", nil);
     dispatch_async(queue, ^{
-        //开始测试
         [self performCommandsWithIndex:index];
         
         //回到主线程
@@ -731,14 +728,15 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
             if ([NSThread isMainThread]) {
                 NSLog(@"It is main thread");
                 
-//                [self uploadToPDCAwithIndex:index];
+                    [self uploadToPDCAwithIndex:index];
                 
-                [self createSingleCSVFileWithIndex:index];
-                [self createAllCSVFileWithIndex:index];
-                [self stopTestWithIndex:index];
+                    [self createSingleCSVFileWithIndex:index];
+                    [self createAllCSVFileWithIndex:index];
+                    [self stopTestWithIndex:index];
                     
                 [self->_commMCU write:@"1" type:@"serial"];
                 [NSThread sleepForTimeInterval:self->_waitTime2.floatValue];
+                
             }
         });
     });
@@ -819,10 +817,10 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         
         switch (index) {
             case 0:
-                listViewTmp = self->_tabViewController.tableView1.listView;
+                listViewTmp = _tabViewController.tableView1.listView;
                 break;
             case 1:
-                listViewTmp = self->_tabViewController.tableView2.listView;
+                listViewTmp = _tabViewController.tableView2.listView;
                 break;
                 
             default:
@@ -855,7 +853,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         
         ICTSerialComm *serialTmp = nil;
         //ICTSerialComm *visaUSBTmp = nil;
-        //_infoData就是TestScript.plist，是一个数组，i从0开始遍历
+        
         for (; ((i < [_infoData count]) && ((_iTestState1 == 1) || (_iTestState2 == 1))); i++) {
             NSString *strTestItem = [[_infoData objectAtIndex:i] objectForKey:@"TestItem"]; 
             NSString *strDevice = [[_infoData objectAtIndex:i] objectForKey:@"Device"];
@@ -1034,6 +1032,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
                 break;
         }
         
+      
     }
 }
 
@@ -1099,15 +1098,14 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([strMessage length] > 0) {
-            
             NSTextView *textEditTmp = nil;
             
             switch (index) {
                 case 0:
-                    textEditTmp = self->_tabViewController.messageTextView1.textEdit;
+                    textEditTmp = _tabViewController.messageTextView1.textEdit;
                     break;
                 case 1:
-                    textEditTmp = self->_tabViewController.messageTextView2.textEdit;
+                    textEditTmp = _tabViewController.messageTextView2.textEdit;
                     break;
                     
                 default:
@@ -1251,6 +1249,17 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
             [newItem setObject:[NSNumber numberWithBool:YES] forKey:@"Status"];
         } else {
             [newItem setObject:[NSNumber numberWithBool:NO] forKey:@"Status"];
+        }
+    }
+    
+    if([strResBuffer length] > 0)
+    {
+        if([strItem isEqualToString:@"LS"])
+        {
+            strResBuffer = [NSString stringWithFormat:@"%.3f",[strResBuffer floatValue]];
+        }else if([strItem isEqualToString:@"Q"] || [strItem isEqualToString:@"RS"] || [strItem isEqualToString:@"DCR"])
+        {
+            strResBuffer = [NSString stringWithFormat:@"%.2f",[strResBuffer floatValue]];
         }
     }
     
@@ -1665,9 +1674,12 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     NSString *strStopTimeTmp = nil;
     NSString *strTestTimeTmp = nil;
     NSString *strSNTmp = nil;
-    NSString *strSNCoilTmp = nil;
+    NSString *strCoilSNTmp = nil;
+    NSString *strUpperFerriteSNTmp = nil;
+    NSString *strLowerFerriteSNTmp = nil;
    // NSString *strLineTmp = nil;
     NSString *strConfigTmp = nil;
+    NSString *strFerriteConfigTmp = nil;
     NSString *strDescriptionTmp = nil;
     NSString *strLayerTmp = nil;
     
@@ -1677,13 +1689,15 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
             strStartTimeTmp = _strStartTime1;
             strStopTimeTmp = _strStopTime1;
             strSNTmp = _strSN1;
-            strSNCoilTmp = _strCoilSN1;
+            strCoilSNTmp = _strCoilSN1;
+            strUpperFerriteSNTmp = _strUpperFerriteSN1;
+            strLowerFerriteSNTmp = _strLowerFerriteSN1;
             //strLineTmp = _comboBox[0].stringValue;
             strConfigTmp = _strConfig1;
+            strFerriteConfigTmp = _strFerriteConfig1;
             strDescriptionTmp = _strDescription;
             strTestTimeTmp = _strTestTime1;
             strLayerTmp = _strLayer;
-            strConfigTmp = _strCoilSNConfig1;
             
             break;
         case 1:
@@ -1745,31 +1759,36 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         strTestResult = @"PASS";
     }
     
-    NSString *measureData = [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@\r\n",
+    NSString *measureData = [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@\r\n",
                              strSNTmp,
+//                             strCoilSNTmp,
+                             strUpperFerriteSNTmp,
+//                             strLowerFerriteSNTmp,
+//                             strLayerTmp,
                              _strConfig1,
+//                             strFerriteConfigTmp,
                              _strStationID,
                              strTestResult,
                              strFailList,
                              strStartTimeTmp,
                              strStopTimeTmp,
-                             //strTestTimeTmp,
+                             strTestTimeTmp,
 //                             strDescriptionTmp,
                              [muteArrRet componentsJoinedByString:@","]];
     
     CreateCSVFile *csv = [[CreateCSVFile alloc] init];
     
     //NSString *filePath = [NSString stringWithFormat:@"/vault/LCRTest/%@/Single", [self getCurrentDate]];
-     NSString *filePath = [NSString stringWithFormat:@"/vault/LCRTest/%@/Single",_strSWName];
+     NSString *filePath = [NSString stringWithFormat:@"/vault/LCRTest/%@/Single",[self getData:_strSWName startSet:@"_" endSet:@""]];
     NSString *fileName = [NSString stringWithFormat:@"LCRTest_%@_%@",strSNTmp,[self getCurrentTime2]];
     
     [csv createFileWithPath:filePath WithName:fileName WithType:@"csv"];
     
     NSString *line0 = [NSString stringWithFormat:@"LCRTest,Version:%@\r\n", _strSWVersion];
-    NSString *line1 = [NSString stringWithFormat:@"SerialNumber,Config,StationID,Test Pass/Fail Status,Fail Items,StartTime,EndTime,%@\r\n", [muteArrName componentsJoinedByString:@","]];
-    NSString *line2 = [NSString stringWithFormat:@"Upper Limit----->,,,,,,,%@\r\n", [muteArrUpper componentsJoinedByString:@","]];
-    NSString *line3 = [NSString stringWithFormat:@"Lower Limit----->,,,,,,,%@\r\n", [muteArrLower componentsJoinedByString:@","]];
-    NSString *line4 = [NSString stringWithFormat:@"Measurement Unit----->,,,,,,,%@\r\n", [muteArrUnit componentsJoinedByString:@","]];
+    NSString *line1 = [NSString stringWithFormat:@"SerialNumber,UpperFerriteSN,Config,StationID,Test Pass/Fail Status,Fail Items,StartTime,EndTime,TestTime,%@\r\n", [muteArrName componentsJoinedByString:@","]];
+    NSString *line2 = [NSString stringWithFormat:@"Upper Limit----->,,,,,,,,,%@\r\n", [muteArrUpper componentsJoinedByString:@","]];
+    NSString *line3 = [NSString stringWithFormat:@"Lower Limit----->,,,,,,,,,%@\r\n", [muteArrLower componentsJoinedByString:@","]];
+    NSString *line4 = [NSString stringWithFormat:@"Measurement Unit----->,,,,,,,,,%@\r\n", [muteArrUnit componentsJoinedByString:@","]];
     NSString *data = [NSString stringWithFormat:@"%@%@%@%@%@",line0, line1, line2, line3, line4];
     
     [csv appendDataToFileWithString:data];
@@ -1800,9 +1819,12 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     NSString *strStopTimeTmp = nil;
     NSString *strTestTimeTmp = nil;
     NSString *strSNTmp = nil;
-    NSString *strSNCoilTmp = nil;
+    NSString *strCoilSNTmp = nil;
+    NSString *strUpperFerriteSNTmp = nil;
+    NSString *strLowerFerriteSNTmp = nil;
     //NSString *strLineTmp = nil;
     NSString *strConfigTmp = nil;
+    NSString *strFerriteConfigTmp = nil;
     NSString *strDescriptionTmp = nil;
     NSString *strLayerTmp = nil;
     
@@ -1812,9 +1834,12 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
             strStartTimeTmp = _strStartTime1;
             strStopTimeTmp = _strStopTime1;
             strSNTmp = _strSN1;
-            strSNCoilTmp = _strCoilSN1;
+            strCoilSNTmp = _strCoilSN1;
+            strUpperFerriteSNTmp = _strUpperFerriteSN1;
+            strLowerFerriteSNTmp = _strLowerFerriteSN1;
            //strLineTmp = _comboBox[0].stringValue;
-            strConfigTmp = _strCoilSNConfig1;
+            strConfigTmp = _strConfig1;
+            strFerriteConfigTmp = _strFerriteConfig1;;
             strDescriptionTmp = _strDescription;
             strTestTimeTmp = _strTestTime1;
             strLayerTmp = _strLayer;
@@ -1881,18 +1906,16 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     
     //strStopTimeTmp = [self getCurrentTime];
     
-    NSString *measureData = [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@\r\n",
+    NSString *measureData = [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@\r\n",
                              strSNTmp,
-//                             strSNCoilTmp,
-//                             strLayerTmp,
+                             strUpperFerriteSNTmp,
                              _strConfig1,
                              _strStationID,
                              strTestResult,
                              strFailList,
                              strStartTimeTmp,
                              strStopTimeTmp,
-                             //strTestTimeTmp,
-//                             strDescriptionTmp,
+                             strTestTimeTmp,
                              [muteArrRet componentsJoinedByString:@","]];
     
     CreateCSVFile *csv = [[CreateCSVFile alloc] init];
@@ -1913,10 +1936,10 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     
     if (!([fileContent rangeOfString:@"LCRTest"].length > 0)) {
         NSString *line0 = [NSString stringWithFormat:@"LCRTest,Version:%@\r\n", _strSWVersion];
-        NSString *line1 = [NSString stringWithFormat:@"SerialNumber,Config,StationID,Test Pass/Fail Status,Fail Items,StartTime,EndTime,%@\r\n", [muteArrName componentsJoinedByString:@","]];
-        NSString *line2 = [NSString stringWithFormat:@"Upper Limit----->,,,,,,,%@\r\n", [muteArrUpper componentsJoinedByString:@","]];
-        NSString *line3 = [NSString stringWithFormat:@"Lower Limit----->,,,,,,,%@\r\n", [muteArrLower componentsJoinedByString:@","]];
-        NSString *line4 = [NSString stringWithFormat:@"Measurement Unit----->,,,,,,,%@\r\n", [muteArrUnit componentsJoinedByString:@","]];
+        NSString *line1 = [NSString stringWithFormat:@"SerialNumber,UpperFerriteSN,Config,StationID,Test Pass/Fail Status,Fail Items,StartTime,EndTime,TestTime,%@\r\n", [muteArrName componentsJoinedByString:@","]];
+        NSString *line2 = [NSString stringWithFormat:@"Upper Limit----->,,,,,,,,,%@\r\n", [muteArrUpper componentsJoinedByString:@","]];
+        NSString *line3 = [NSString stringWithFormat:@"Lower Limit----->,,,,,,,,,%@\r\n", [muteArrLower componentsJoinedByString:@","]];
+        NSString *line4 = [NSString stringWithFormat:@"Measurement Unit----->,,,,,,,,,%@\r\n", [muteArrUnit componentsJoinedByString:@","]];
         NSString *data = [NSString stringWithFormat:@"%@%@%@%@%@",line0, line1, line2, line3, line4];
         
         [csv appendDataToFileWithString:data];
@@ -1930,8 +1953,6 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     [muteArrLower removeAllObjects];
     [muteArrUnit removeAllObjects];
 }
-
-
 
 #pragma mark - checkpoint
 
@@ -2094,14 +2115,18 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
     //NSString *strStartTimeTmp = nil;
     //NSString *strStopTimeTmp = nil;
     NSString *strSNTmp = nil;
-    
+    NSString *strSNConfigTmp = nil;
+    NSString *strFerriteSNConfigTmp = nil;
+    NSString *strSbulidTmp = nil;
     InstantPudding *pdcaTmp = nil;
     
     switch (index) {
         case 0:
             arrayTmp = _commandData1;
             strSNTmp = [_strSN1 substringToIndex:17];
-            
+            strSNConfigTmp = _strConfig1;
+            strFerriteSNConfigTmp = _strFerriteConfig1;
+            strSbulidTmp = [NSString stringWithFormat:@"%@_%@",_strSpecialBuildName,_strConfig1];
             pdcaTmp = _pdca1;
             break;
         case 1:
@@ -2124,32 +2149,84 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
         
         if ([pdcaTmp ValidateSerialNumber:strSNTmp]) {
             
-            
+            ICTLog(@"***********PDCA开始******************");
+            if(_strSWName.length > 0){
             if (![pdcaTmp AddIPAttribute:@"softwarename" Value:_strSWName]) {
                 NSLog(@"softwarename error");
             }
+            }
+            ICTLog(_strSWName);
             
+            if(_strSWVersion.length > 0){
             if (![pdcaTmp AddIPAttribute:@"softwareversion" Value:_strSWVersion]) {
                 NSLog(@"softwareversion error");
             }
+            }
+             ICTLog(_strSWVersion);
             
+            if(_strSN1.length > 0){
             if (![pdcaTmp AddIPAttribute:@"ICT_BARCODE" Value:_strSN1]) {
                 NSLog(@"ICT_BARCODE error");
             }
-           
-            if (![pdcaTmp AddIPAttribute:@"S_BUILD" Value:_strSpecialBuildName]) {
+            }
+            ICTLog(_strSN1);
+//            if (![pdcaTmp AddIPAttribute:@"FerrriteCFG" Value:strFerriteSNConfigTmp]) {
+//                NSLog(@"FerrriteCFG error");
+//            }
+            if(strSbulidTmp.length > 0){
+            if (![pdcaTmp AddIPAttribute:@"S_BUILD" Value:strSbulidTmp]) {
                 NSLog(@"S_BUILD error");
             }
+            }
+             ICTLog(strSbulidTmp);
             
+            if(_strSpecialBuildName.length > 0){
+            if (![pdcaTmp AddIPAttribute:@"BUILD_EVENT" Value:_strSpecialBuildName]) {
+                NSLog(@"S_BUILD error");
+            }
+            }
+            ICTLog(_strSpecialBuildName);
+            
+            if(strSNConfigTmp.length > 0){
+            if (![pdcaTmp AddIPAttribute:@"BUILD_MATRIX_CONFIG" Value:strSNConfigTmp]) {
+                NSLog(@"BUILD_MATRIX_CONFIG error");
+            }
+            }
+            
+            if(_strCoilSN1.length > 0){
+            if(![pdcaTmp AddIPAttribute:@"COIL_SN" Value:_strCoilSN1])
+            {
+                NSLog(@"COIL_SN error");
+            }
+            }
+            
+            if(_strUpperFerriteSN1.length > 0){
+            if(![pdcaTmp AddIPAttribute:@"UPPERFERRITE_SN" Value:_strUpperFerriteSN1])
+            {
+                NSLog(@"UPPERFERRITE_SN error");
+            }
+            }
+            if(_strLowerFerriteSN1.length > 0){
+            if(![pdcaTmp AddIPAttribute:@"LOWERFERRITE_SN" Value:_strLowerFerriteSN1])
+            {
+                NSLog(@"LOWERFERRITE_SN error");
+            }
+            }
+            ICTLog(strSNConfigTmp);
             
             [pdcaTmp AddIPAttribute:@"serialnumber" Value:strSNTmp];
+             ICTLog(strSNTmp);
             
-            
-            
-            
+             ICTLog(@"***********PDCA-data******************");
             //upload analyzed data
             for (int i = 0; i < [arrayTmp count] ; i++) {
                 NSDictionary *dic = [arrayTmp objectAtIndex:i];
+                
+                 ICTLog([dic objectForKey:@"TestItem"]);
+                 ICTLog([dic objectForKey:@"TestResult"]);
+                 ICTLog([dic objectForKey:@"Lower"]);
+                 ICTLog([dic objectForKey:@"Upper"]);
+                 ICTLog([dic objectForKey:@"Unit"]);
                 
                 [pdcaTmp AddIPTestItem:[dic objectForKey:@"TestItem"]
                              TestValue:[dic objectForKey:@"TestResult"]
@@ -2158,7 +2235,7 @@ extern NSString* const MACOS_COMM_RECVSIGNAL_CHAR;     //notification for receiv
                               Priority:IP_PRIORITY_REALTIME_WITH_ALARMS
                                  Units:[dic objectForKey:@"Unit"]];
             }
-            
+             ICTLog(@"***********PDCA结束******************");
             [pdcaTmp IPDoneAndCommit:strSNTmp];
         }
     }

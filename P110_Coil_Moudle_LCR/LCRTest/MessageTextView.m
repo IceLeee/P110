@@ -40,8 +40,8 @@
     
     _textEdit = [[NSTextView alloc] initWithFrame:[[_scrollViewContainer contentView] bounds]];
     ////
-//    _textEdit.backgroundColor = [NSColor blackColor];
-//    _textEdit.textColor = [NSColor greenColor];
+    //_textEdit.backgroundColor = [NSColor blackColor];
+    //_textEdit.textColor = [NSColor greenColor];
     [_textEdit setEditable:NO];
     
     [_scrollViewContainer setDocumentView:_textEdit];
